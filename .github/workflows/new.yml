@@ -21,7 +21,7 @@ jobs:
         cmake $CMakeArguments
         cmake --build . --config Release
         cmake --build . --config Release --target install
-        $env:PATH+=$ProtobufInstallPath
+        $env:PATH+=";$ProtobufInstallPath"
         $env:PATH
     - name: configure
       run: |
