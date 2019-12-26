@@ -16,7 +16,9 @@ jobs:
         $CurrentyDir
         $ProtobufInstallPath=Join-Path $CurrentyDir install
         $ProtobufInstallPath
-        mkdir build-vs2019; cd build-vs2019; cmake -DCMAKE_INSTALL_PREFIX=$ProtobufInstallPath -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_MSVC_STATIC_RUNTIME=OFF ../cmake
+        mkdir build-vs2019; cd build-vs2019
+        $CMakeArguments = "-DCMAKE_INSTALL_PREFIX=$ProtobufInstallPath", '-Dprotobuf_BUILD_TESTS=OFF', '-Dprotobuf_MSVC_STATIC_RUNTIME=OFF', '../cmake'
+        cmake $CMakeArguments
         cmake --build . --config Release
         cmake --build . --config Release --target install
         $env:PATH+=$ProtobufInstallPath
