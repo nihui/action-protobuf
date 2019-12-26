@@ -19,6 +19,7 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DCMAKE_PREFIX_PATH=../protobuf-3.11.2/build-vs2019/install ..
+        dir ../protobuf-3.11.2/build-vs2019/install/cmake
+        cmake -Dprotobuf_DIR=../protobuf-3.11.2/build-vs2019/install/cmake ..
     - name: build
       run: cmake --build build
