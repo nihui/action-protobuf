@@ -25,12 +25,13 @@ jobs:
         $env:PATH
         $env:Protobuf_DIR = $ProtobufInstallPath
         cd ..\..
-        mkdir build-before
-        cd build-before
-        cmake ..
-        cd ..
     - name: configure
       run: |
+        Get-ChildItem -Recurse -Directory -Depth 1 |select FullName
+        $CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition;
+        $CurrentyDir
+        $ProtobufInstallPath = Join-Path $CurrentyDir install
+        $ProtobufInstallPath
         mkdir build
         cd build
         $Protobuf_LIBRARIES = Join-Path $ProtobufInstallPath lib/libprotobuf.lib
