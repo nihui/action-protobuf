@@ -12,7 +12,7 @@ jobs:
         Invoke-WebRequest -Uri https://github.com/protocolbuffers/protobuf/archive/v3.11.2.zip -OutFile protobuf-3.11.2.zip
         7z x ./protobuf-3.11.2.zip
         cd protobuf-3.11.2
-        $CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition;
+        $CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
         $CurrentyDir
         $ProtobufInstallPath = Join-Path $CurrentyDir install
         $ProtobufInstallPath
@@ -23,21 +23,15 @@ jobs:
         cmake --build . --config Release --target install
         $env:PATH+=";$ProtobufInstallPath"
         $env:PATH
-        $env:Protobuf_DIR = $ProtobufInstallPath
         cd ..\..
     - name: configure
       run: |
         Get-ChildItem -Recurse -Directory -Depth 1 |select FullName
-        $CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition;
-        $CurrentyDir
+        $CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
         $ProtobufInstallPath = Join-Path $CurrentyDir install
-        $ProtobufInstallPath
+        $env:Protobuf_DIR = $ProtobufInstallPath
         mkdir build
         cd build
-        $Protobuf_LIBRARIES = Join-Path $ProtobufInstallPath lib/libprotobuf.lib
-        $Protobuf_INCLUDE_DIR = Join-Path $ProtobufInstallPath include
-        $Protobuf_LIBRARIES
-        $Protobuf_INCLUDE_DIR
         $CMakeArguments = "-DProtobuf_INCLUDE_DIR=$Protobuf_INCLUDE_DIR", "-DProtobuf_LIBRARIES=$Protobuf_LIBRARIES", '..'
         cmake $CMakeArguments
     - name: build
