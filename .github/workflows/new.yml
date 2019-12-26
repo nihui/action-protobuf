@@ -24,6 +24,11 @@ jobs:
         $env:PATH+=";$ProtobufInstallPath"
         $env:PATH
         $env:Protobuf_DIR = $ProtobufInstallPath
+        cd ..\..
+        mkdir build-before
+        cd build-before
+        cmake ..
+        cd ..
     - name: configure
       run: |
         mkdir build
