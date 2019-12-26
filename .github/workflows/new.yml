@@ -14,10 +14,12 @@ jobs:
         cd protobuf-3.11.2
         $CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition;
         $CurrentyDir
-        mkdir build-vs2019; cd build-vs2019; cmake -DCMAKE_INSTALL_PREFIX=$CurrentyDir/install -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_MSVC_STATIC_RUNTIME=OFF ../cmake
+        $ProtobufInstallPath=Join-Path $CurrentyDir install
+        $ProtobufInstallPath
+        mkdir build-vs2019; cd build-vs2019; cmake -DCMAKE_INSTALL_PREFIX=$ProtobufInstallPath -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_MSVC_STATIC_RUNTIME=OFF ../cmake
         cmake --build . --config Release
         cmake --build . --config Release --target install
-        $env:PATH+=$CurrentyDir/install
+        $env:PATH+=$ProtobufInstallPath
         $env:PATH
     - name: configure
       run: |
