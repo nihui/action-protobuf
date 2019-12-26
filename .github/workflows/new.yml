@@ -23,6 +23,7 @@ jobs:
         cmake --build . --config Release --target install
         $env:PATH+=";$ProtobufInstallPath"
         $env:PATH
+        $env:Protobuf_DIR = $ProtobufInstallPath
     - name: configure
       run: |
         mkdir build
