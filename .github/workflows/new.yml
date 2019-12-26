@@ -14,7 +14,7 @@ jobs:
         cd protobuf-3.11.2
         $CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition;
         $CurrentyDir
-        $ProtobufInstallPath=Join-Path $CurrentyDir install
+        $ProtobufInstallPath = Join-Path $CurrentyDir install
         $ProtobufInstallPath
         mkdir build-vs2019; cd build-vs2019
         $CMakeArguments = "-DCMAKE_INSTALL_PREFIX=$ProtobufInstallPath", '-Dprotobuf_BUILD_TESTS=OFF', '-Dprotobuf_MSVC_STATIC_RUNTIME=OFF', '../cmake'
@@ -28,6 +28,11 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake ..
+        $Protobuf_LIBRARIES = Join-Path $ProtobufInstallPath lib/libprotobuf.lib
+        $Protobuf_INCLUDE_DIR = Join-Path $ProtobufInstallPath include
+        $Protobuf_LIBRARIES
+        $Protobuf_INCLUDE_DIR
+        $CMakeArguments = "-DProtobuf_INCLUDE_DIR=$Protobuf_INCLUDE_DIR", "-DProtobuf_LIBRARIES=$Protobuf_LIBRARIES", '..'
+        cmake $CMakeArguments
     - name: build
       run: cmake --build build
