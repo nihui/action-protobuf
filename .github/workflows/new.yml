@@ -25,6 +25,28 @@ jobs:
         cmake --build . -j 2
         cmake --build . --target install
 
+  macos-clang:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: checkout swiftshader
+      uses: actions/checkout@v2
+      with:
+        repository: google/swiftshader
+        path: swiftshader
+        ref: 59465799210b3f4962af1a9dc44a4ffecb422c10
+    - name: checkout swiftshader submodules
+      run: |
+        cd swiftshader
+        git submodule update --init --recursive
+    - name: swiftshader
+      run: |
+        cd swiftshader
+        mkdir -p build; cd build
+        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 ..
+        cmake --build . -j 2
+        cmake --build . --target install
+
   windows-vs2019:
     runs-on: windows-latest
     steps:
