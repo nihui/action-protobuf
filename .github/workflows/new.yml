@@ -16,8 +16,7 @@ jobs:
     - name: checkout swiftshader submodules
       run: |
         cd swiftshader
-        git submodule sync --recursive
-        git submodule update --init --force --recursive --depth=1
+        git submodule update --init --recursive
     - name: swiftshader
       run: |
         cd swiftshader
@@ -39,8 +38,7 @@ jobs:
     - name: checkout swiftshader submodules
       run: |
         cd swiftshader
-        git submodule sync --recursive
-        git submodule update --init --force --recursive --depth=1
+        git submodule update --init --recursive
     - name: swiftshader
       run: |
         cd swiftshader
