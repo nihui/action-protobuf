@@ -8,10 +8,11 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: checkout swiftshader
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         repository: google/swiftshader
         path: swiftshader
+        ref: 59465799210b3f4962af1a9dc44a4ffecb422c10
     - name: checkout swiftshader submodules
       run: |
         cd swiftshader
@@ -30,10 +31,11 @@ jobs:
     steps:
     - uses: actions/checkout@v1
     - name: checkout swiftshader
-      uses: actions/checkout@v1
+      uses: actions/checkout@v2
       with:
         repository: google/swiftshader
         path: swiftshader
+        ref: 59465799210b3f4962af1a9dc44a4ffecb422c10
     - name: checkout swiftshader submodules
       run: |
         cd swiftshader
