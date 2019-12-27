@@ -12,27 +12,14 @@ jobs:
         Invoke-WebRequest -Uri https://github.com/protocolbuffers/protobuf/archive/v3.11.2.zip -OutFile protobuf-3.11.2.zip
         7z x ./protobuf-3.11.2.zip
         cd protobuf-3.11.2
-        #$CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition;
-        #$CurrentyDir
-        #$ProtobufInstallPath = Join-Path $CurrentyDir install
-        #$ProtobufInstallPath
         mkdir build-vs2019; cd build-vs2019
-        #$CMakeArguments = "-DCMAKE_INSTALL_PREFIX=$ProtobufInstallPath", '-Dprotobuf_BUILD_TESTS=OFF', '-Dprotobuf_MSVC_STATIC_RUNTIME=OFF', '../cmake'
-        #cmake $CMakeArguments
         cmake -DCMAKE_INSTALL_PREFIX=install -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_MSVC_STATIC_RUNTIME=OFF ../cmake
         cmake --build . --config Release
         cmake --build . --config Release --target install
     - name: configure
       run: |
-        $CurrentyDir = Split-Path -Path $MyInvocation.MyCommand.Definition -Parent
-        #$CurrentyDir = Split-Path -Parent $MyInvocation.MyCommand.Definition;
-        #$ProtobufInstallPath = Join-Path $CurrentyDir install
-        #$Protobuf_LIBRARIES = Join-Path $ProtobufInstallPath lib/libprotobuf.lib
-        #$Protobuf_INCLUDE_DIR = Join-Path $ProtobufInstallPath include
         mkdir build
         cd build
-        #$CMakeArguments = "-DProtobuf_INCLUDE_DIR=$Protobuf_INCLUDE_DIR", "-DProtobuf_LIBRARIES=$Protobuf_LIBRARIES", '..'
-        #cmake $CMakeArguments
-        cmake -DProtobuf_INCLUDE_DIR=$CurrentyDir/protobuf-3.11.2/build-vs2019/install/include -DProtobuf_LIBRARIES=$CurrentyDir/protobuf-3.11.2/build-vs2019/install/lib/libprotobuf.lib ..
+        cmake -DProtobuf_INCLUDE_DIR="../protobuf-3.11.2/build-vs2019/install/include" -DProtobuf_LIBRARIES="../protobuf-3.11.2/build-vs2019/install/lib/libprotobuf.lib" ..
     - name: build
       run: cmake --build build
