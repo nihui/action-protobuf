@@ -3,33 +3,47 @@ name: CI
 on: [push]
 
 jobs:
+  linux-gcc:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+    - name: checkout swiftshader
+      uses: actions/checkout@v1
+      with:
+        repository: google/swiftshader
+        path: swiftshader
+    - name: checkout swiftshader submodules
+      run: |
+        cd swiftshader
+        git submodule sync --recursive
+        git submodule update --init --force --recursive --depth=1
+    - name: swiftshader
+      run: |
+        cd swiftshader
+        mkdir build; cd build
+        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 ..
+        cmake --build . -j 2
+        cmake --build . --target install
+
   windows-vs2019:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
-    - name: cache-protobuf
-      id: cache-protobuf
-      uses: actions/cache@v1
+    - name: checkout swiftshader
+      uses: actions/checkout@v1
       with:
-        path: "protobuf-3.11.2"
-        key: protobuf-3.11.2-build-vs2019-install
-    - name: protobuf
-      if: steps.cache-protobuf.outputs.cache-hit != 'true'
+        repository: google/swiftshader
+        path: swiftshader
+    - name: checkout swiftshader submodules
       run: |
-        Invoke-WebRequest -Uri https://github.com/protocolbuffers/protobuf/archive/v3.11.2.zip -OutFile protobuf-3.11.2.zip
-        7z x ./protobuf-3.11.2.zip
-        cd protobuf-3.11.2
+        cd swiftshader
+        git submodule sync --recursive
+        git submodule update --init --force --recursive --depth=1
+    - name: swiftshader
+      run: |
+        cd swiftshader
         mkdir build-vs2019; cd build-vs2019
-        cmake -DCMAKE_INSTALL_PREFIX=install -Dprotobuf_BUILD_TESTS=OFF -Dprotobuf_MSVC_STATIC_RUNTIME=OFF ../cmake
-        cmake --build . --config Release
+        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 ..
+        cmake --build . --config Release -j 2
         cmake --build . --config Release --target install
-    - name: configure
-      run: |
-        $Protobuf_LIBRARIES = Resolve-Path 'protobuf-3.11.2\build-vs2019\install\lib\libprotobuf.lib'
-        $Protobuf_INCLUDE_DIR = Resolve-Path 'protobuf-3.11.2\build-vs2019\install\include'
-        $Protobuf_PROTOC_EXECUTABLE = Resolve-Path 'protobuf-3.11.2\build-vs2019\install\bin\protoc.exe'
-        mkdir build
-        cd build
-        cmake -DProtobuf_INCLUDE_DIR="$Protobuf_INCLUDE_DIR" -DProtobuf_LIBRARIES="$Protobuf_LIBRARIES" -DProtobuf_PROTOC_EXECUTABLE="$Protobuf_PROTOC_EXECUTABLE" ..
-    - name: build
-      run: cmake --build build
+
