@@ -20,6 +20,6 @@ jobs:
       run: |
         mkdir build
         cd build
-        cmake -DProtobuf_INCLUDE_DIR="../protobuf-3.11.2/build-vs2019/install/include" -DProtobuf_LIBRARIES="../protobuf-3.11.2/build-vs2019/install/lib/libprotobuf.lib" ..
+        cmake -DProtobuf_INCLUDE_DIR='..\protobuf-3.11.2\build-vs2019\install\include' -DProtobuf_LIBRARIES='..\protobuf-3.11.2\build-vs2019\install\lib\libprotobuf.lib' ..
     - name: build
       run: cmake --build build
