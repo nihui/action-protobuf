@@ -7,65 +7,98 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-    - name: checkout swiftshader
+    - name: cache-swiftshader
+      id: cache-swiftshader
+      uses: actions/cache@v1
+      with:
+        path: swiftshader-install
+        key: swiftshader-linux-install
+    - name: checkout-swiftshader
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       uses: actions/checkout@v2
       with:
         repository: google/swiftshader
         path: swiftshader
         ref: 59465799210b3f4962af1a9dc44a4ffecb422c10
-    - name: checkout swiftshader submodules
+    - name: checkout-swiftshader-submodules
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       run: |
         cd swiftshader
         git submodule update --init --recursive
     - name: swiftshader
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       run: |
         cd swiftshader
         mkdir -p build; cd build
-        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 ..
+        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 -DWARNINGS_AS_ERRORS=0 ..
         cmake --build . -j 2
-        cmake --build . --target install
+        mkdir $GITHUB_WORKSPACE/swiftshader-install
+        ls Linux -l
+        cp Linux/* $GITHUB_WORKSPACE/swiftshader-install
 
   macos-clang:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v1
-    - name: checkout swiftshader
+    - name: cache-swiftshader
+      id: cache-swiftshader
+      uses: actions/cache@v1
+      with:
+        path: swiftshader-install
+        key: swiftshader-macos-install
+    - name: checkout-swiftshader
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       uses: actions/checkout@v2
       with:
         repository: google/swiftshader
         path: swiftshader
         ref: 59465799210b3f4962af1a9dc44a4ffecb422c10
-    - name: checkout swiftshader submodules
+    - name: checkout-swiftshader-submodules
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       run: |
         cd swiftshader
         git submodule update --init --recursive
     - name: swiftshader
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       run: |
         cd swiftshader
         mkdir -p build; cd build
-        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 ..
+        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 -DWARNINGS_AS_ERRORS=0 ..
         cmake --build . -j 2
-        cmake --build . --target install
+        mkdir $GITHUB_WORKSPACE/swiftshader-install
+        ls Darwin -l
+        cp Darwin/* $GITHUB_WORKSPACE/swiftshader-install
 
   windows-vs2019:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
-    - name: checkout swiftshader
+    - name: cache-swiftshader
+      id: cache-swiftshader
+      uses: actions/cache@v1
+      with:
+        path: swiftshader-install
+        key: swiftshader-windows-install
+    - name: checkout-swiftshader
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       uses: actions/checkout@v2
       with:
         repository: google/swiftshader
         path: swiftshader
         ref: 59465799210b3f4962af1a9dc44a4ffecb422c10
-    - name: checkout swiftshader submodules
+    - name: checkout-swiftshader-submodules
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       run: |
         cd swiftshader
         git submodule update --init --recursive
     - name: swiftshader
+      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
       run: |
         cd swiftshader
         mkdir build-vs2019; cd build-vs2019
-        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 ..
+        cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 -DWARNINGS_AS_ERRORS=0 ..
         cmake --build . --config Release -j 2
-        cmake --build . --config Release --target install
+        mkdir $GITHUB_WORKSPACE/swiftshader-install
+        dir Windows
+        cp Windows/* $GITHUB_WORKSPACE/swiftshader-install
 
