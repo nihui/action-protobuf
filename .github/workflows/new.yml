@@ -71,6 +71,11 @@ jobs:
     runs-on: windows-latest
     steps:
     - uses: actions/checkout@v1
+    - name: echo
+      run: |
+        echo "$GITHUB_WORKSPACE"
+        echo "$GITHUB_WORKSPACE/swiftshader-install"
+        echo "$GITHUB_WORKSPACE\\swiftshader-install"
     - name: cache-swiftshader
       id: cache-swiftshader
       uses: actions/cache@v1
@@ -96,6 +101,5 @@ jobs:
         mkdir build-vs2019; cd build-vs2019
         cmake -DCMAKE_INSTALL_PREFIX=install -DBUILD_EGL=0 -DBUILD_GLESv2=0 -DBUILD_GLES_CM=0 -DBUILD_VULKAN=1 -DBUILD_SAMPLES=0 -DBUILD_TESTS=0 -DWARNINGS_AS_ERRORS=0 ..
         cmake --build . --config Release -j 2
-        mkdir $GITHUB_WORKSPACE/swiftshader-install
-        cp Windows/* $GITHUB_WORKSPACE/swiftshader-install
-
+        mkdir "$GITHUB_WORKSPACE/swiftshader-install"
+        cp Windows/* "$GITHUB_WORKSPACE/swiftshader-install"
