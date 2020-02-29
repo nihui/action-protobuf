@@ -20,4 +20,4 @@ jobs:
         git remote add upstream https://$GITHUB_TOKEN@github.com/nihui/action-protobuf.wiki.git
         git push upstream master -f
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WIKI_SYNC_BOT_TOKEN }}
