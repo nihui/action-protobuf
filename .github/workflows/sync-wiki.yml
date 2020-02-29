@@ -1,0 +1,27 @@
+name: sync-wiki
+on:
+  push:
+    branches: [master]
+
+jobs:
+  sync-wiki:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v1
+
+    - name: setup
+      run: |
+        git config user.name "wiki-sync-bot"
+        git config user.email "wiki-sync-bot@qq.com"
+
+    - name: init
+      run: |
+        cp -r docs $GITHUB_WORKSPACE/action-protobuf.wiki
+        cd $GITHUB_WORKSPACE/action-protobuf.wiki
+        git init
+        git add .
+        git commit -m "sync"
+        git remote add upstream https://$GITHUB_TOKEN@github.com/nihui/action-protobuf.wiki.git
+        git push upstream master -f
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
