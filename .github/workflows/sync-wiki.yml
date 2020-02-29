@@ -8,16 +8,12 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v1
-
-    - name: setup
-      run: |
-        git config user.name "wiki-sync-bot"
-        git config user.email "wiki-sync-bot@qq.com"
-
-    - name: init
+    - name: sync
       run: |
         cp -r docs $GITHUB_WORKSPACE/action-protobuf.wiki
         cd $GITHUB_WORKSPACE/action-protobuf.wiki
+        git config --global user.name "wiki-sync-bot"
+        git config --global user.email "wiki-sync-bot@qq.com"
         git init
         git add .
         git commit -m "sync"
