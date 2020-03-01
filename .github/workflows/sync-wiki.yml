@@ -17,12 +17,5 @@ jobs:
         git init
         git add .
         git commit -m "sync"
-    - name: push1
-      run: |
-        cd $GITHUB_WORKSPACE/action-protobuf.wiki
-        git remote add upstream https://${{ secrets.WIKI_SYNC_BOT_TOKEN }}@github.com/nihui/action-protobuf.wiki.git
-
-    - name: push2
-      run: |
-        cd $GITHUB_WORKSPACE/action-protobuf.wiki
+        git remote add upstream https://${{ secrets.GITHUB_TOKEN }}@github.com/nihui/action-protobuf.wiki.git
         git push upstream master -f
