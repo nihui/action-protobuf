@@ -17,5 +17,5 @@ jobs:
         git init
         git add .
         git commit -m "sync"
-        git remote add upstream https://${{ secrets.GITHUB_TOKEN }}@github.com/nihui/action-protobuf.wiki.git
+        git remote add upstream https://${{ secrets.WIKI_SYNC_BOT_TOKEN }}@github.com/nihui/action-protobuf.wiki.git
         git push upstream master -f
