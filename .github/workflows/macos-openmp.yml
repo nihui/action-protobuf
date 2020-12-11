@@ -10,11 +10,9 @@ jobs:
       run: |
         wget https://github.com/llvm/llvm-project/releases/download/llvmorg-9.0.1/openmp-9.0.1.src.tar.xz
         tar -xf openmp-9.0.1.src.tar.xz
-        ls
         cd openmp-9.0.1.src
-        ls
         mkdir build
         cd build
-        cmake -DLIBOMP_ENABLE_SHARED=OFF ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build .
-        
+        find .
