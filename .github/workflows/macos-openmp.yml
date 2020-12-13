@@ -13,18 +13,15 @@ jobs:
       uses: actions/cache@v1
       with:
         path: openmp-install
-        key: openmp-macos-install-20201213
-    - name: checkout-openmp
-      if: steps.cache-openmp.outputs.cache-hit != 'true'
-      uses: actions/checkout@v2
-      with:
-        repository: llvm/llvm-project
-        path: llvm-project
-        ref: 36a23b33aa5ef2600e53772680fc14b4e5c676f0
+        key: openmp-macos-install-20201213-2
     - name: openmp
       if: steps.cache-openmp.outputs.cache-hit != 'true'
       run: |
-        cd llvm-project/openmp
+        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/openmp-11.0.0.src.tar.xz
+        tar -xf openmp-11.0.0.src.tar.xz
+        cd openmp-11.0.0.src
+        sed -i'' -e '/.size __kmp_unnamed_critical_addr/d' runtime/src/z_Linux_asm.S
+        sed -i'' -e 's/__kmp_unnamed_critical_addr/__kmp_unnamed_critical_addr/g' runtime/src/z_Linux_asm.S
         mkdir -p build && cd build
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
             -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
@@ -39,8 +36,8 @@ jobs:
 
     - name: install-openmp
       run: |
-        cp $GITHUB_WORKSPACE/openmp-install/include/* $DEVELOPER_DIR/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
-        cp $GITHUB_WORKSPACE/openmp-install/lib/libomp.a $DEVELOPER_DIR/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib
+        sudo cp $GITHUB_WORKSPACE/openmp-install/include/* $DEVELOPER_DIR/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+        sudo cp $GITHUB_WORKSPACE/openmp-install/lib/libomp.a $DEVELOPER_DIR/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib
 
     - name: build
       run: |
