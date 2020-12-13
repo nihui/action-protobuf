@@ -1,7 +1,7 @@
 project(hello)
+cmake_minimum_required(VERSION 3.10)
 
-find_package(Protobuf REQUIRED)
-#find_package(protobuf CONFIG REQUIRED)
+find_package(OpenMP REQUIRED)
 
-add_executable(hello hello.c)
-target_link_libraries(hello PRIVATE ${PROTOBUF_LIBRARIES})
+add_executable(hello hello.cpp)
+target_link_libraries(hello OpenMP::OpenMP_CXX)
