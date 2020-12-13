@@ -38,6 +38,6 @@ jobs:
     - name: build
       run: |
         mkdir -p build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DOpenMP_C_INCLUDE_DIR=$GITHUB_WORKSPACE/openmp-install/include -DOpenMP_CXX_INCLUDE_DIR=$GITHUB_WORKSPACE/openmp-install/include -DOpenMP_libomp_LIBRARY=$GITHUB_WORKSPACE/openmp-install/lib/libomp.a ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DOpenMP_C_INCLUDE_DIR="$GITHUB_WORKSPACE/openmp-install/include" -DOpenMP_CXX_INCLUDE_DIR="$GITHUB_WORKSPACE/openmp-install/include" -DOpenMP_libomp_LIBRARY="$GITHUB_WORKSPACE/openmp-install/lib/libomp.a" ..
         cmake --build . -j 2
         ./hello
