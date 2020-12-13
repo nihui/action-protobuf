@@ -26,7 +26,7 @@ jobs:
       run: |
         cd llvm-project/openmp
         mkdir -p build && cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DPERL_EXECUTABLE=/usr/local/bin/perl -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
         mkdir $GITHUB_WORKSPACE/openmp-install
