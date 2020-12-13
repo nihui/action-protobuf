@@ -4,7 +4,7 @@ env:
   DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
 jobs:
   ios-clang:
-    runs-on: ios-latest
+    runs-on: macos-latest
     steps:
 
     - name: cache-openmp
@@ -25,10 +25,7 @@ jobs:
       run: |
         cd llvm-project/openmp
         mkdir -p build && cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install \
-            -DLIBOMP_ENABLE_SHARED=OFF \
-            -DLIBOMP_OMPT_SUPPORT=OFF \
-            -DLIBOMP_USE_HWLOC=OFF ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
         mkdir $GITHUB_WORKSPACE/openmp-install
@@ -40,10 +37,7 @@ jobs:
 
     - name: build
       run: |
-        mkdir build && cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install \
-            -DOpenMP_C_INCLUDE_DIR=$GITHUB_WORKSPACE/openmp-install/include \
-            -DOpenMP_CXX_INCLUDE_DIR=$GITHUB_WORKSPACE/openmp-install/include \
-            -DOpenMP_libomp_LIBRARY=$GITHUB_WORKSPACE/openmp-install/lib/libomp.a ..
+        mkdir -p build && cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DOpenMP_C_INCLUDE_DIR=$GITHUB_WORKSPACE/openmp-install/include -DOpenMP_CXX_INCLUDE_DIR=$GITHUB_WORKSPACE/openmp-install/include -DOpenMP_libomp_LIBRARY=$GITHUB_WORKSPACE/openmp-install/lib/libomp.a ..
         cmake --build . -j 2
         ./hello
