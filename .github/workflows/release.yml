@@ -7,7 +7,7 @@ on:
 env:
   DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
 jobs:
-  macos-clang:
+  macos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
