@@ -3,6 +3,8 @@ cmake_minimum_required(VERSION 3.10)
 
 find_package(OpenMP REQUIRED)
 
+message("OpenMP_C_FLAGS = ${OpenMP_C_FLAGS}")
+message("OpenMP_CXX_FLAGS = ${OpenMP_CXX_FLAGS}")
 message("OpenMP_C_INCLUDE_DIRS = ${OpenMP_C_INCLUDE_DIRS}")
 message("OpenMP_CXX_INCLUDE_DIRS = ${OpenMP_CXX_INCLUDE_DIRS}")
 message("OpenMP_C_LIBRARIES = ${OpenMP_C_LIBRARIES}")
