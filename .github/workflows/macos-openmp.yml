@@ -38,6 +38,7 @@ jobs:
         file $GITHUB_WORKSPACE/openmp-install/lib/libomp.a
 
     - name: install-openmp
+      run: |
         cp $GITHUB_WORKSPACE/openmp-install/include/* $DEVELOPER_DIR/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
         cp $GITHUB_WORKSPACE/openmp-install/lib/libomp.a $DEVELOPER_DIR/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib
 
