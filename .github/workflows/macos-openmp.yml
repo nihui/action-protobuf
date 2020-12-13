@@ -36,12 +36,12 @@ jobs:
 
     - name: install-openmp
       run: |
-        sudo cp $GITHUB_WORKSPACE/openmp-install/include/* /usr/local/include
-        sudo cp $GITHUB_WORKSPACE/openmp-install/lib/libomp.a /usr/local/lib
+        sudo cp $GITHUB_WORKSPACE/openmp-install/include/* /usr/include
+        sudo cp $GITHUB_WORKSPACE/openmp-install/lib/libomp.a /usr/lib
 
     - name: build
       run: |
         mkdir -p build && cd build
         cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" ..
-        cmake --build . -j 2
+        cmake --build . -j 2 -v
         ./hello
