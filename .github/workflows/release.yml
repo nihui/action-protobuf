@@ -31,7 +31,8 @@ jobs:
             -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
-        mkdir $GITHUB_WORKSPACE/openmp-install
+        rm -rf $GITHUB_WORKSPACE/openmp-install
+        mkdir -p $GITHUB_WORKSPACE/openmp-install
         cp -r install/* $GITHUB_WORKSPACE/openmp-install
 
     - name: upload
@@ -66,7 +67,8 @@ jobs:
             -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
-        mkdir $GITHUB_WORKSPACE/openmp-install
+        rm -rf $GITHUB_WORKSPACE/openmp-install
+        mkdir -p $GITHUB_WORKSPACE/openmp-install
         cp -r install/* $GITHUB_WORKSPACE/openmp-install
 
     - name: upload
@@ -101,7 +103,8 @@ jobs:
             -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
-        mkdir $GITHUB_WORKSPACE/openmp-install
+        rm -rf $GITHUB_WORKSPACE/openmp-install
+        mkdir -p $GITHUB_WORKSPACE/openmp-install
         cp -r install/* $GITHUB_WORKSPACE/openmp-install
 
     - name: upload
@@ -136,7 +139,8 @@ jobs:
             -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
-        mkdir $GITHUB_WORKSPACE/openmp-install
+        rm -rf $GITHUB_WORKSPACE/openmp-install
+        mkdir -p $GITHUB_WORKSPACE/openmp-install
         cp -r install/* $GITHUB_WORKSPACE/openmp-install
 
     - name: upload
@@ -171,7 +175,8 @@ jobs:
             -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
-        mkdir $GITHUB_WORKSPACE/openmp-install
+        rm -rf $GITHUB_WORKSPACE/openmp-install
+        mkdir -p $GITHUB_WORKSPACE/openmp-install
         cp -r install/* $GITHUB_WORKSPACE/openmp-install
 
     - name: upload
@@ -259,7 +264,7 @@ jobs:
         ln -s Versions/Current/Resources openmp.framework/Resources
         ln -s Versions/Current/openmp openmp.framework/openmp
         lipo -create artifacts/openmp-ios-bitcode/lib/libomp.a artifacts/openmp-ios-simulator-bitcode/lib/libomp.a -o openmp.framework/Versions/A/openmp
-        cp -r artifacts/openmp-ios/include/* openmp.framework/Versions/A/Headers/
+        cp -r artifacts/openmp-ios-bitcode/include/* openmp.framework/Versions/A/Headers/
         cp Info.plist openmp.framework/Versions/A/Resources/
         rm -f openmp-ios-bitcode.framework.zip
         zip -9 -y -r openmp-ios-bitcode.framework.zip openmp.framework
