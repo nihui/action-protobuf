@@ -26,7 +26,8 @@ jobs:
       run: |
         cd llvm-project/openmp
         mkdir -p build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
+            -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
         mkdir $GITHUB_WORKSPACE/openmp-install
@@ -36,13 +37,13 @@ jobs:
       run: |
         file $GITHUB_WORKSPACE/openmp-install/lib/libomp.a
 
+    - name: install-openmp
+        cp $GITHUB_WORKSPACE/openmp-install/include/* $DEVELOPER_DIR/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/include
+        cp $GITHUB_WORKSPACE/openmp-install/lib/libomp.a $DEVELOPER_DIR/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk/usr/lib
+
     - name: build
       run: |
         mkdir -p build && cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" \
-            -DOpenMP_C_INCLUDE_DIRS="$GITHUB_WORKSPACE/openmp-install/include" \
-            -DOpenMP_CXX_INCLUDE_DIRS="$GITHUB_WORKSPACE/openmp-install/include" \
-            -DOpenMP_C_LIBRARIES="$GITHUB_WORKSPACE/openmp-install/lib/libomp.a" \
-            -DOpenMP_CXX_LIBRARIES="$GITHUB_WORKSPACE/openmp-install/lib/libomp.a" ..
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" ..
         cmake --build . -j 2
         ./hello

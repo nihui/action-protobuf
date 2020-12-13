@@ -26,7 +26,10 @@ jobs:
       run: |
         cd llvm-project/openmp
         mkdir -p build && cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DPERL_EXECUTABLE=/usr/local/bin/perl -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../../ios.toolchain.cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install \
+            -DIOS_PLATFORM=OS -DENABLE_BITCODE=0 -DENABLE_ARC=0 -DENABLE_VISIBILITY=0 -DIOS_ARCH="armv7;arm64" \
+            -DPERL_EXECUTABLE=/usr/local/bin/perl \
+            -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
         cmake --build . -j 2
         cmake --build . --target install
         mkdir $GITHUB_WORKSPACE/openmp-install
@@ -36,9 +39,14 @@ jobs:
       run: |
         file $GITHUB_WORKSPACE/openmp-install/lib/libomp.a
 
+    - name: install-openmp
+        cp $GITHUB_WORKSPACE/openmp-install/include/* $DEVELOPER_DIR/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/include
+        cp $GITHUB_WORKSPACE/openmp-install/lib/libomp.a $DEVELOPER_DIR/Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS.sdk/usr/lib
+
     - name: build
       run: |
         mkdir -p build && cd build
-        cmake -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DOpenMP_C_INCLUDE_DIR="$GITHUB_WORKSPACE/openmp-install/include" -DOpenMP_CXX_INCLUDE_DIR="$GITHUB_WORKSPACE/openmp-install/include" -DOpenMP_libomp_LIBRARY="$GITHUB_WORKSPACE/openmp-install/lib/libomp.a" ..
+        cmake -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake -DIOS_PLATFORM=OS -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install \
+            -DIOS_PLATFORM=OS -DENABLE_BITCODE=0 -DENABLE_ARC=0 -DENABLE_VISIBILITY=0 -DIOS_ARCH="armv7;arm64" ..
         cmake --build . -j 2
         ./hello
