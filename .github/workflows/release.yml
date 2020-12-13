@@ -7,7 +7,7 @@ on:
 env:
   DEVELOPER_DIR: /Applications/Xcode_12.2.app/Contents/Developer
 jobs:
-  macos:
+  build-macos:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -40,7 +40,7 @@ jobs:
         name: openmp-macos
         path: openmp-install
 
-  ios:
+  build-ios:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -75,7 +75,7 @@ jobs:
         name: openmp-ios
         path: openmp-install
 
-  ios-simulator:
+  build-ios-simulator:
     runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
@@ -110,9 +110,9 @@ jobs:
         name: openmp-ios-simulator
         path: openmp-install
 
-  release:
-    needs: [macos, ios, ios-simulator]
-    runs-on: ubuntu-latest
+  package-macos:
+    needs: [build-macos]
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v2
 
@@ -121,7 +121,7 @@ jobs:
       with:
         path: artifacts
 
-    - name: package-macos
+    - name: package
       run: |
         rm -rf openmp.framework
         mkdir -p openmp.framework/Versions/A/Headers
@@ -136,7 +136,24 @@ jobs:
         rm -f openmp-macos.framework.zip
         zip -9 -y -r openmp-macos.framework.zip openmp.framework
 
-    - name: package-ios
+    - name: upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: openmp-macos-framework
+        path: openmp-macos.framework.zip
+
+  package-ios:
+    needs: [build-ios, build-ios-simulator]
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: download
+      uses: actions/download-artifact@v2
+      with:
+        path: artifacts
+
+    - name: package
       run: |
         rm -rf openmp.framework
         mkdir -p openmp.framework/Versions/A/Headers
@@ -150,6 +167,23 @@ jobs:
         cp Info.plist openmp.framework/Versions/A/Resources/
         rm -f openmp-ios.framework.zip
         zip -9 -y -r openmp-ios.framework.zip openmp.framework
+
+    - name: upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: openmp-ios-framework
+        path: openmp-ios.framework.zip
+
+  release:
+    needs: [package-macos, package-ios]
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: download
+      uses: actions/download-artifact@v2
+      with:
+        path: artifacts
 
     - name: create-release
       id: create_release
@@ -168,7 +202,7 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: openmp-macos.framework.zip
+        asset_path: artifacts/openmp-macos-framework/openmp-macos.framework.zip
         asset_name: openmp-macos.framework.zip
         asset_content_type: application/zip
 
@@ -178,6 +212,6 @@ jobs:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
         upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: openmp-ios.framework.zip
+        asset_path: artifacts/openmp-ios-framework/openmp-ios.framework.zip
         asset_name: openmp-ios.framework.zip
         asset_content_type: application/zip
