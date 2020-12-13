@@ -6,13 +6,28 @@ jobs:
   macos-clang:
     runs-on: macos-latest
     steps:
-    - name: build
+
+    - name: cache-openmp
+      id: cache-openmp
+      uses: actions/cache@v1
+      with:
+        path: openmp-install
+        key: openmp-macos-install-20201213
+    - name: checkout-openmp
+      if: steps.cache-openmp.outputs.cache-hit != 'true'
+      uses: actions/checkout@v2
+      with:
+        repository: llvm/llvm-project
+        path: llvm-project
+        ref: 36a23b33aa5ef2600e53772680fc14b4e5c676f0
+    - name: openmp
+      if: steps.cache-openmp.outputs.cache-hit != 'true'
       run: |
-        wget https://github.com/llvm/llvm-project/releases/download/llvmorg-11.0.0/openmp-11.0.0.src.tar.xz
-        tar -xf openmp-11.0.0.src.tar.xz
-        cd openmp-11.0.0.src
-        mkdir build
-        cd build
-        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
-        cmake --build .
+        cd llvm-project/openmp
+        mkdir -p build && cd build
+        cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=install -DCMAKE_OSX_ARCHITECTURES="x86_64;arm64" -DLIBOMP_ENABLE_SHARED=OFF -DLIBOMP_OMPT_SUPPORT=OFF -DLIBOMP_USE_HWLOC=OFF ..
+        cmake --build . -j 2
         find .
+        find install
+        mkdir $GITHUB_WORKSPACE/openmp-install
+        cp -r install/* $GITHUB_WORKSPACE/openmp-install
