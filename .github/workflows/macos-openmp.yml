@@ -6,6 +6,7 @@ jobs:
   macos-clang:
     runs-on: macos-latest
     steps:
+    - uses: actions/checkout@v2
 
     - name: cache-openmp
       id: cache-openmp
