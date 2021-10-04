@@ -67,3 +67,13 @@ jobs:
         cmake --build . --config Release -j 2
         mkdir "$env:GITHUB_WORKSPACE/swiftshader-install-subzero"
         Copy-Item -Path "Windows\*" -Destination "$env:GITHUB_WORKSPACE\swiftshader-install-subzero"
+
+    - name: test
+      run: |
+        $env:VK_ICD_FILENAMES="$env:GITHUB_WORKSPACE\swiftshader-install\vk_swiftshader_icd.json"
+        .\VulkanRT\VulkanRT-1.2.189.0-Components\x64\vulkaninfo.exe
+
+    - name: test-subzero
+      run: |
+        $env:VK_ICD_FILENAMES="$env:GITHUB_WORKSPACE\swiftshader-install-subzero\vk_swiftshader_icd.json"
+        .\VulkanRT\VulkanRT-1.2.189.0-Components\x64\vulkaninfo.exe
