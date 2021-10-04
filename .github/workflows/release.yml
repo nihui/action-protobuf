@@ -65,17 +65,27 @@ jobs:
         cmake --build . --config Release -j 2
         mkdir "$env:GITHUB_WORKSPACE/swiftshader-install-subzero"
         Copy-Item -Path "Windows\*" -Destination "$env:GITHUB_WORKSPACE\swiftshader-install-subzero"
+        
+    - name: checkout-ncnn
+      uses: actions/checkout@v2
+      with:
+        repository: Tencent/ncnn
+        path: ncnn
 
-    - name: test-none
+    - name: build-ncnn
       run: |
-        .\VulkanRT\VulkanRT-1.2.189.0-Components\x64\vulkaninfo.exe
+        cd ncnn
+        git submodule update --init
+        mkdir build; cd build
+        cmake -DNCNN_VULKAN=ON -DNCNN_BUILD_TESTS=ON -DNCNN_BUILD_TOOLS=OFF -DNCNN_BUILD_EXAMPLES=OFF ..
+        cmake --build . --config Release -j 2
 
     - name: test
       run: |
-        Copy-Item -Path '.\swiftshader-install\vulkan-1.dll' -Destination '.\VulkanRT\VulkanRT-1.2.189.0-Components\x64\'
-        .\VulkanRT\VulkanRT-1.2.189.0-Components\x64\vulkaninfo.exe
+        Copy-Item -Path '.\swiftshader-install\vulkan-1.dll' -Destination '.\ncnn\build\tests'
+        cd ncnn/build; ctest -C Release --output-on-failure -j 2
 
     - name: test-subzero
       run: |
-        Copy-Item -Path '.\swiftshader-install-subzero\vulkan-1.dll' -Destination '.\VulkanRT\VulkanRT-1.2.189.0-Components\x64\'
-        .\VulkanRT\VulkanRT-1.2.189.0-Components\x64\vulkaninfo.exe
+        Copy-Item -Path '.\swiftshader-install\vulkan-1.dll' -Destination '.\ncnn\build\tests'
+        cd ncnn/build; ctest -C Release --output-on-failure -j 2
