@@ -74,6 +74,8 @@ jobs:
 
     - name: build-ncnn
       run: |
+        $env:VULKAN_SDK="C:/VulkanSDK/1.2.189.0"
+        $env:Path+=";C:/VulkanSDK/1.2.189.0/Bin"
         cd ncnn
         git submodule update --init
         mkdir build; cd build
