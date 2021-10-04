@@ -77,7 +77,7 @@ jobs:
         type swiftshader-install\vk_swiftshader_icd.json
         Copy-Item -Path '.\swiftshader-install\vk_swiftshader.dll' -Destination '.\'
         Copy-Item -Path '.\swiftshader-install\vk_swiftshader.dll' -Destination '.\VulkanRT\VulkanRT-1.2.189.0-Components\x64\'
-        set VK_ICD_FILENAMES="$env:GITHUB_WORKSPACE\swiftshader-install\vk_swiftshader_icd.json"
+        set VK_ICD_FILENAMES=".\swiftshader-install\vk_swiftshader_icd.json"
         .\VulkanRT\VulkanRT-1.2.189.0-Components\x64\vulkaninfo.exe
 
     - name: test-subzero
@@ -85,5 +85,5 @@ jobs:
         type swiftshader-install-subzero\vk_swiftshader_icd.json
         Copy-Item -Path '.\swiftshader-install\vk_swiftshader.dll' -Destination '.\'
         Copy-Item -Path '.\swiftshader-install\vk_swiftshader.dll' -Destination '.\VulkanRT\VulkanRT-1.2.189.0-Components\x64\'
-        set VK_ICD_FILENAMES="$env:GITHUB_WORKSPACE\swiftshader-install-subzero\vk_swiftshader_icd.json"
+        set VK_ICD_FILENAMES=".\swiftshader-install-subzero\vk_swiftshader_icd.json"
         .\VulkanRT\VulkanRT-1.2.189.0-Components\x64\vulkaninfo.exe
