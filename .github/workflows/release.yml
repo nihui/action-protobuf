@@ -22,8 +22,8 @@ jobs:
       if: steps.cache-lavapipe.outputs.cache-hit != 'true'
       run: |
         mkdir -p "$GITHUB_WORKSPACE/lavapipe-install"
-        sudo echo "deb-src http://azure.archive.ubuntu.com/ubuntu focal main" >> /etc/apt/sources.list
-        sudo echo "deb-src http://azure.archive.ubuntu.com/ubuntu focal-updates main" >> /etc/apt/sources.list
+        echo 'deb-src http://azure.archive.ubuntu.com/ubuntu focal main' | sudo tee -a /etc/apt/sources.list
+        echo 'deb-src http://azure.archive.ubuntu.com/ubuntu focal-updates main' | sudo tee -a /etc/apt/sources.list
         sudo apt-get update
         sudo apt-get build-dep mesa
         cd mesa
