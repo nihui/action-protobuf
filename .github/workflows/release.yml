@@ -22,6 +22,7 @@ jobs:
       if: steps.cache-lavapipe.outputs.cache-hit != 'true'
       run: |
         mkdir -p "$GITHUB_WORKSPACE/lavapipe-install"
+        sudo apt-get update
         sudo apt-get build-dep mesa
         cd mesa
         mkdir build
