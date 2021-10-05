@@ -43,6 +43,11 @@ jobs:
         sudo apt-get update
         sudo apt install -y libvulkan-dev vulkan-utils
 
+    - name: vulkaninfo
+      run: |
+        export VK_ICD_FILENAMES="$GITHUB_WORKSPACE/lavapipe-install/share/vulkan/icd.d/lvp_icd.x86_64.json"
+        vulkaninfo
+
     - name: ncnn
       uses: actions/checkout@v2
       with:
