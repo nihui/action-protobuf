@@ -2,92 +2,30 @@ name: release
 on: push
 
 jobs:
-  windows-vs2019-gpu:
-    runs-on: windows-latest
+  lavapipe:
+    runs-on: ubuntu-20.04
     steps:
-    - name: vulkansdk
-      run: |
-        Invoke-WebRequest -Uri https://sdk.lunarg.com/sdk/download/1.2.189.0/windows/VulkanSDK-1.2.189.0-Installer.exe?Human=true -OutFile VulkanSDK.exe
-        $installer = Start-Process -FilePath VulkanSDK.exe -Wait -PassThru -ArgumentList @("/S");
-        $installer.WaitForExit();
-    - name: cache-swiftshader
-      id: cache-swiftshader
+    - name: cache-lavapipe
+      id: cache-lavapipe
       uses: actions/cache@v2.1.6
       with:
-        path: swiftshader-install
-        key: swiftshader-windows-install-20211002
-    - name: checkout-swiftshader
-      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
+        path: lavapipe-install
+        key: lavapipe-linux-install-20211002
+    - name: checkout-lavapipe
+      if: steps.cache-lavapipe.outputs.cache-hit != 'true'
       uses: actions/checkout@v2
       with:
-        repository: google/swiftshader
-        path: swiftshader
-        ref: f43b9df4c8a9959047e2e1d7e111554ab3f9a3bf
-    - name: checkout-swiftshader-submodules
-      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
+        repository: mesa3d/mesa
+        path: mesa
+        ref: 0a592db57360a7847ca9c57e47f6200a2992f2e9
+    - name: lavapipe
+      if: steps.cache-lavapipe.outputs.cache-hit != 'true'
       run: |
-        cd swiftshader
-        git -c submodule."third_party/git-hooks".update=none submodule update --init --recursive
-    - name: swiftshader
-      if: steps.cache-swiftshader.outputs.cache-hit != 'true'
-      run: |
-        cd swiftshader
-        mkdir build-vs2019; cd build-vs2019
-        cmake -DCMAKE_INSTALL_PREFIX=install -DSWIFTSHADER_BUILD_EGL=FALSE -DSWIFTSHADER_BUILD_GLESv2=FALSE -DSWIFTSHADER_BUILD_GLES_CM=FALSE -DSWIFTSHADER_BUILD_VULKAN=TRUE -DSWIFTSHADER_BUILD_PVR=FALSE -DSWIFTSHADER_BUILD_TESTS=FALSE -DSWIFTSHADER_ENABLE_ASTC=FALSE -DSWIFTSHADER_WARNINGS_AS_ERRORS=FALSE -DREACTOR_BACKEND=Subzero -DREACTOR_DEFAULT_OPT_LEVEL=Default -DCMAKE_BUILD_TYPE=Release ..
-        cmake --build . --config Release -j 2
-        mkdir "$env:GITHUB_WORKSPACE/swiftshader-install"
-        Copy-Item -Path "Windows\*" -Destination "$env:GITHUB_WORKSPACE\swiftshader-install"
-
-    - name: cache-swiftshader-subzero
-      id: cache-swiftshader-subzero
-      uses: actions/cache@v2.1.6
-      with:
-        path: swiftshader-install-subzero
-        key: swiftshader-windows-install-subzero-20211002
-    - name: checkout-swiftshader-subzero
-      if: steps.cache-swiftshader-subzero.outputs.cache-hit != 'true'
-      uses: actions/checkout@v2
-      with:
-        repository: google/swiftshader
-        path: swiftshader
-        ref: f43b9df4c8a9959047e2e1d7e111554ab3f9a3bf
-    - name: checkout-swiftshader-subzero-submodules
-      if: steps.cache-swiftshader-subzero.outputs.cache-hit != 'true'
-      run: |
-        cd swiftshader
-        git -c submodule."third_party/git-hooks".update=none submodule update --init --recursive
-    - name: swiftshader-subzero
-      if: steps.cache-swiftshader-subzero.outputs.cache-hit != 'true'
-      run: |
-        cd swiftshader
-        mkdir build-vs2019; cd build-vs2019
-        cmake -DCMAKE_INSTALL_PREFIX=install -DSWIFTSHADER_BUILD_EGL=FALSE -DSWIFTSHADER_BUILD_GLESv2=FALSE -DSWIFTSHADER_BUILD_GLES_CM=FALSE -DSWIFTSHADER_BUILD_VULKAN=TRUE -DSWIFTSHADER_BUILD_PVR=FALSE -DSWIFTSHADER_BUILD_TESTS=FALSE -DSWIFTSHADER_ENABLE_ASTC=FALSE -DSWIFTSHADER_WARNINGS_AS_ERRORS=FALSE -DREACTOR_BACKEND=Subzero -DREACTOR_DEFAULT_OPT_LEVEL=Default -DCMAKE_BUILD_TYPE=Release ..
-        cmake --build . --config Release -j 2
-        mkdir "$env:GITHUB_WORKSPACE/swiftshader-install-subzero"
-        Copy-Item -Path "Windows\*" -Destination "$env:GITHUB_WORKSPACE\swiftshader-install-subzero"
-        
-    - name: checkout-ncnn
-      uses: actions/checkout@v2
-      with:
-        repository: Tencent/ncnn
-        path: ncnn
-
-    - name: build-ncnn
-      run: |
-        $env:VULKAN_SDK="C:/VulkanSDK/1.2.189.0"
-        $env:Path+=";C:/VulkanSDK/1.2.189.0/Bin"
-        cd ncnn
-        git submodule update --init
-        mkdir build; cd build
-        cmake -DNCNN_VULKAN=ON -DNCNN_BUILD_TESTS=ON -DNCNN_BUILD_TOOLS=OFF -DNCNN_BUILD_EXAMPLES=OFF ..
-        cmake --build . --config Release -j 2
-
-    - name: test
-      run: |
-        Copy-Item -Path '.\swiftshader-install\vulkan-1.dll' -Destination '.\ncnn\build\tests'
-        cd ncnn/build; ctest -C Release --output-on-failure -j 2
-
-    - name: test-subzero
-      run: |
-        Copy-Item -Path '.\swiftshader-install\vulkan-1.dll' -Destination '.\ncnn\build\tests'
-        cd ncnn/build; ctest -C Release --output-on-failure -j 2
+        mkdir "$env:GITHUB_WORKSPACE/lavapipe-install"
+        sudo apt-get build-dep mesa
+        cd mesa
+        mkdir build
+        cd build
+        meson -Dprefix="$env:GITHUB_WORKSPACE/lavapipe-install" -Dbuildtype=release -Db_lto=true -Db_ndebug=true -Dplatforms="x11" -Ddri3=enabled -Ddri-drivers="" -Dgallium-drivers=swrast -Dgallium-vdpau=disabled -Dgallium-xvmc=disabled -Dgallium-omx=disabled -Dgallium-va=disabled -Dgallium-xa=disabled -Dgallium-opencl=disabled -Dopencl-native=false -Dvulkan-drivers=swrast -Dshader-cache=disabled -Dgles1=disabled -Dgles2=disabled -Dopengl=false -Dgbm=disabled -Dglx=disabled -Degl=disabled -Dllvm=enabled -Dvalgrind=disabled -Dlibunwind=disabled -Dlmsensors=disabled ..
+        ninja
+        ninja install
