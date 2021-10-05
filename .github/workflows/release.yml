@@ -41,7 +41,7 @@ jobs:
     - name: vulkansdk
       run: |
         sudo apt-get update
-        sudo apt install -y libvulkan-dev vulkan-utils
+        sudo apt install -y libvulkan-dev vulkan-utils libxcb-randr0
 
     - name: vulkaninfo
       run: |
