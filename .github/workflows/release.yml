@@ -57,4 +57,5 @@ jobs:
     - name: test
       run: |
         export VK_ICD_FILENAMES="$GITHUB_WORKSPACE/lavapipe-install/share/vulkan/icd.d/lvp_icd.x86_64.json"
+        cd ncnn
         cd build && ctest --output-on-failure
