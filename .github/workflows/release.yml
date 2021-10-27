@@ -20,7 +20,7 @@ jobs:
       run: |
         cd ncnn/tools/pnnx
         mkdir build && cd build
-        cmake ..
+        cmake -DTorch_INSTALL_DIR="$HOME/.local/lib/python3.8/site-packages/torch" ..
         cmake --build . -j 2
     - name: test
       run: |
