@@ -34,9 +34,23 @@ jobs:
       run: |
         cd ncnn/tools/pnnx
         mkdir build && cd build
-        cmake -DTorch_INSTALL_DIR="$HOME/.local/lib/python3.8/site-packages/torch" ..
+        cmake -DTorch_INSTALL_DIR="$HOME/.local/lib/python3.8/site-packages/torch" -DCMAKE_BUILD_TYPE=Debug -DPNNX_COVERAGE=ON ..
         cmake --build . -j 2
     - name: test
       run: |
         cd ncnn/tools/pnnx
         cd build && ctest --output-on-failure
+
+    - name: lcov-collect
+      run: |
+        cd ncnn/tools/pnnx
+        cd build
+        lcov -d ./src -c -o lcov.info
+        lcov -r lcov.info '/usr/*' -o lcov.info
+        lcov -r lcov.info '*/torch/include/*' -o lcov.info
+        lcov --list lcov.info
+    - name: codecov
+      uses: codecov/codecov-action@v2.1.0
+      with:
+        token: ${{ secrets.CODECOV_TOKEN }}
+        file: ncnn/tools/pnnx/build/lcov.info
