@@ -23,6 +23,9 @@ jobs:
       run: |
         pip install torch==${{ matrix.torch-version }}+cpu torchvision==${{ matrix.torchvision-version }}+cpu -f https://download.pytorch.org/whl/torch_stable.html
 
+    - name: lcov
+      run: sudo apt-get install lcov
+
     - name: ncnn
       uses: actions/checkout@v2
       with:
