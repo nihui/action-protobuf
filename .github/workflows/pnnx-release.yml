@@ -28,7 +28,7 @@ jobs:
     - name: package
       run: |
         mkdir pnnx-windows
-        Copy-Item -Verbose -Path "ncnn\tools\pnnx\build\src\Release\pnnx.exe" -Destination pnnx-windows
+        Copy-Item -Verbose -Path "ncnn\tools\pnnx\build\install\bin\pnnx.exe" -Destination pnnx-windows
         Copy-Item -Verbose -Recurse -Path "libtorch\lib\*.dll" -Destination pnnx-windows
         7z a -r pnnx-windows.zip pnnx-windows
     - name: upload
@@ -102,6 +102,7 @@ jobs:
         mkdir pnnx-ubuntu
         cp ncnn/tools/pnnx/build/install/bin/pnnx pnnx-ubuntu
         cp libtorch/lib/*.so pnnx-ubuntu
+        cp libtorch/lib/libgomp*.so* pnnx-ubuntu
         zip -9 -r pnnx-ubuntu.zip pnnx-ubuntu
     - name: upload
       uses: actions/upload-artifact@v2
