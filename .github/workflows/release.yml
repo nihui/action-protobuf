@@ -26,7 +26,7 @@ jobs:
       run: |
         cd ncnn/tools/pnnx
         mkdir build && cd build
-        cmake -DTorch_INSTALL_DIR="$GITHUB_WORKSPACE/libtorch" -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DTorch_INSTALL_DIR="$env:GITHUB_WORKSPACE/libtorch" -DCMAKE_BUILD_TYPE=Release ..
         cmake --build . -j 2
 
   pnnx-macos:
