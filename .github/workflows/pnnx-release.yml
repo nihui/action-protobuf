@@ -21,8 +21,22 @@ jobs:
       run: |
         cd ncnn/tools/pnnx
         mkdir build && cd build
-        cmake -DTorch_INSTALL_DIR="$env:GITHUB_WORKSPACE/libtorch" ..
+        cmake -DCMAKE_INSTALL_PREFIX=install -DTorch_INSTALL_DIR="$env:GITHUB_WORKSPACE/libtorch" ..
         cmake --build . --config Release -j 2
+        cmake --build . --config Release --target install
+
+    - name: package
+      run: |
+        mkdir pnnx-windows
+        Copy-Item -Verbose -Path "ncnn\tools\pnnx\build\src\Release\pnnx.exe" -Destination pnnx-windows
+        Copy-Item -Verbose -Recurse -Path "libtorch\lib\*.dll" -Destination pnnx-windows
+        7z a -r pnnx-windows.zip pnnx-windows
+    - name: upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: pnnx-windows
+        path: pnnx-windows.zip
+
 
   macos-1015:
     runs-on: macos-10.15
@@ -43,8 +57,22 @@ jobs:
       run: |
         cd ncnn/tools/pnnx
         mkdir build && cd build
-        cmake -DTorch_INSTALL_DIR="$GITHUB_WORKSPACE/libtorch" -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_INSTALL_PREFIX=install -DTorch_INSTALL_DIR="$GITHUB_WORKSPACE/libtorch" -DCMAKE_BUILD_TYPE=Release ..
         cmake --build . -j 2
+        cmake --build . --target install
+
+    - name: package
+      run: |
+        mkdir pnnx-macos
+        cp ncnn/tools/pnnx/build/install/bin/pnnx pnnx-macos
+        cp libtorch/lib/*.dylib pnnx-macos
+        zip -9 -r pnnx-macos.zip pnnx-macos
+    - name: upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: pnnx-macos
+        path: pnnx-macos.zip
+
 
   ubuntu-1804:
     runs-on: ubuntu-18.04
@@ -65,5 +93,19 @@ jobs:
       run: |
         cd ncnn/tools/pnnx
         mkdir build && cd build
-        cmake -DTorch_INSTALL_DIR="$GITHUB_WORKSPACE/libtorch" -DCMAKE_BUILD_TYPE=Release ..
+        cmake -DCMAKE_INSTALL_PREFIX=install -DTorch_INSTALL_DIR="$GITHUB_WORKSPACE/libtorch" -DCMAKE_BUILD_TYPE=Release ..
         cmake --build . -j 2
+        cmake --build . --target install
+
+    - name: package
+      run: |
+        mkdir pnnx-ubuntu
+        cp ncnn/tools/pnnx/build/install/bin/pnnx pnnx-ubuntu
+        cp libtorch/lib/*.so pnnx-ubuntu
+        zip -9 -r pnnx-ubuntu.zip pnnx-ubuntu
+    - name: upload
+      uses: actions/upload-artifact@v2
+      with:
+        name: pnnx-ubuntu
+        path: pnnx-ubuntu.zip
+
