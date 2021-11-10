@@ -2,7 +2,61 @@ name: release
 on: push
 
 jobs:
-  pnnx:
+  pnnx-windows:
+    runs-on: windows-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: setup libtorch
+      run: |
+        Invoke-WebRequest -Uri https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.10.0%2Bcpu.zip
+        7z x libtorch-win-shared-with-deps-1.10.0+cpu.zip
+
+    - name: ncnn
+      uses: actions/checkout@v2
+      with:
+        repository: nihui/ncnn
+        path: ncnn
+        ref: pnnx
+        submodules: recursive
+
+    - name: build-pnnx
+      run: |
+        cd ncnn/tools/pnnx
+        mkdir build && cd build
+        cmake -DTorch_INSTALL_DIR="$GITHUB_WORKSPACE/libtorch" -DCMAKE_BUILD_TYPE=Release ..
+        cmake --build . -j 2
+
+  pnnx-macos:
+    runs-on: macos-latest
+
+    strategy:
+      fail-fast: false
+
+    steps:
+    - name: setup libtorch
+      run: |
+        wget https://download.pytorch.org/libtorch/cpu/libtorch-macos-1.10.0.zip
+        unzip -q libtorch-macos-1.10.0.zip
+
+    - name: ncnn
+      uses: actions/checkout@v2
+      with:
+        repository: nihui/ncnn
+        path: ncnn
+        ref: pnnx
+        submodules: recursive
+
+    - name: build-pnnx
+      run: |
+        cd ncnn/tools/pnnx
+        mkdir build && cd build
+        cmake -DTorch_INSTALL_DIR="$GITHUB_WORKSPACE/libtorch" -DCMAKE_BUILD_TYPE=Release ..
+        cmake --build . -j 2
+
+  pnnx-ubuntu:
     runs-on: ubuntu-20.04
 
     strategy:
