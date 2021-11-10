@@ -11,7 +11,7 @@ jobs:
     steps:
     - name: setup libtorch
       run: |
-        Invoke-WebRequest -Uri https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.10.0%2Bcpu.zip
+        Invoke-WebRequest -Uri https://download.pytorch.org/libtorch/cpu/libtorch-win-shared-with-deps-1.10.0%2Bcpu.zip -OutFile libtorch-win-shared-with-deps-1.10.0+cpu.zip
         7z x libtorch-win-shared-with-deps-1.10.0+cpu.zip
 
     - name: ncnn
