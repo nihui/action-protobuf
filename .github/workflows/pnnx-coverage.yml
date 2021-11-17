@@ -9,6 +9,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
+          - torch-version: 1.7.1
+            torchvision-version: 0.8.2
+
           - torch-version: 1.8.1
             torchvision-version: 0.9.1
 
