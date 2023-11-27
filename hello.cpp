@@ -15,6 +15,9 @@
 #include <stdio.h>
 #include <setjmp.h>
 
+#define __arm__
+#define __aarch64__
+
 #if defined _WIN32
 
 #include <windows.h>
