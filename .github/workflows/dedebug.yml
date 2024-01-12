@@ -35,7 +35,7 @@ jobs:
         /Applications/Xcode.app/Contents/Developer/usr/bin/lldb -o run -o quit ./dedebug.app/Contents/MacOS/dedebug
 
   windows:
-    runs-on: windows-latest
+    runs-on: windows-2019
     steps:
     - uses: actions/checkout@v4
     - name: build
@@ -45,4 +45,4 @@ jobs:
         cmake ..
         cmake --build . --config Release
         .\Release\dedebug.exe
-        "C:\Program Files\Microsoft Visual Studio\2022\Enterprise\Common7\IDE\devenv.com" /debugexe .\Release\dedebug.exe
+        "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" /debugexe .\Release\dedebug.exe
