@@ -1,0 +1,45 @@
+name: dedebug
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: build
+      run: |
+        mkdir build && cd build
+        cmake ..
+        cmake --build .
+        ./dedebug
+        gdb -ex run -ex quit ./dedebug
+        lldb -o run -o quit ./dedebug
+
+  macos:
+    runs-on: macos-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: build
+      run: |
+        mkdir build && cd build
+        cmake -DCMAKE_TOOLCHAIN_FILE=../ios.toolchain.cmake -DPLATFORM=MAC -DENABLE_ARC=OFF ..
+        cmake --build .
+        ./dedebug.app/Contents/MacOS/dedebug
+        /Applications/Xcode.app/Contents/Developer/usr/bin/lldb -o run -o quit ./dedebug.app/Contents/MacOS/dedebug
+
+  windows:
+    runs-on: windows-latest
+    steps:
+    - uses: actions/checkout@v4
+    - name: build
+      run: |
+        mkdir build && cd build
+        cmake ..
+        cmake --build . --config Release
+        .\Release\dedebug.exe
+        call 'C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com' /debugexe .\Release\dedebug.exe
