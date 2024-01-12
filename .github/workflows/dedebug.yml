@@ -45,4 +45,5 @@ jobs:
         cmake ..
         cmake --build . --config Release
         .\Release\dedebug.exe
+        gdb -ex run -ex quit .\Release\dedebug.exe
         "C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise\Common7\IDE\devenv.com" /debugexe .\Release\dedebug.exe
