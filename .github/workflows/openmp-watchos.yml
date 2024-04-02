@@ -13,12 +13,6 @@ on:
 concurrency:
   group: watchos-${{ github.ref }}
   cancel-in-progress: true
-env:
-  DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
-  WATCHOS_DEPLOYMENT_TARGET: '6.0'
-  ENABLE_BITCODE: OFF
-  ENABLE_ARC: OFF
-  ENABLE_VISIBILITY: OFF
 permissions:
   contents: read
 
@@ -36,13 +30,14 @@ jobs:
   build:
     runs-on: macos-13
     env:
+      DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
       OPENMP_VERSION: '18.1.2'
       OPENMP_CMAKE_OPTIONS: |
         -DCMAKE_TOOLCHAIN_FILE=../../toolchains/ios.toolchain.cmake \
-        -DDEPLOYMENT_TARGET=$WATCHOS_DEPLOYMENT_TARGET \
-        -DENABLE_BITCODE=$ENABLE_BITCODE \
-        -DENABLE_ARC=$ENABLE_ARC \
-        -DENABLE_VISIBILITY=$ENABLE_VISIBILITY \
+        -DDEPLOYMENT_TARGET='6.0' \
+        -DENABLE_BITCODE=OFF \
+        -DENABLE_ARC=OFF \
+        -DENABLE_VISIBILITY=OFF \
         -DCMAKE_INSTALL_PREFIX=install \
         -DCMAKE_BUILD_TYPE=Release \
         -DPERL_EXECUTABLE=/usr/local/bin/perl \
