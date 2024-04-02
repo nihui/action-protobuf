@@ -3,12 +3,12 @@ on:
   push:
     branches: [master]
     paths:
-    - '.github/workflows/watchos.yml'
+    - '.github/workflows/openmp-watchos.yml'
     - 'toolchains/ios.toolchain.cmake'
   pull_request:
     branches: [master]
     paths:
-    - '.github/workflows/watchos.yml'
+    - '.github/workflows/openmp-watchos.yml'
     - 'toolchains/ios.toolchain.cmake'
 concurrency:
   group: watchos-${{ github.ref }}
