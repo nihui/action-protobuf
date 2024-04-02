@@ -1,4 +1,7 @@
 #include <stdio.h>
+#include <sys/sysctl.h>
+#include <sys/types.h>
+
 int main()
 {
     int r = 0;
