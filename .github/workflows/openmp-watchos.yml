@@ -23,6 +23,16 @@ permissions:
   contents: read
 
 jobs:
+  core-count-test:
+    runs-on: macos-13
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: core-count-test
+      run: |
+        clang core-count-test.c -o core-count-test
+        ./core-count-test
+
   build:
     runs-on: macos-13
     env:
@@ -42,11 +52,6 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-
-    - name: core-count-test
-      run: |
-        clang core-count-test.c -o core-count-test
-        ./core-count-test
 
     - name: cache-openmp
       id: cache-openmp
