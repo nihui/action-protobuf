@@ -15,8 +15,6 @@ concurrency:
   cancel-in-progress: true
 env:
   DEVELOPER_DIR: /Applications/Xcode_15.2.app/Contents/Developer
-  MAC_DEPLOYMENT_TARGET: '10.13'
-  MAC_ARM64_DEPLOYMENT_TARGET: '11.0'
   WATCHOS_DEPLOYMENT_TARGET: '6.0'
   ENABLE_BITCODE: OFF
   ENABLE_ARC: OFF
@@ -26,7 +24,7 @@ permissions:
 
 jobs:
   core-count-test:
-    runs-on: macos-13
+    runs-on: macos-latest
     steps:
     - uses: actions/checkout@v4
 
