@@ -45,7 +45,6 @@ jobs:
 
     - name: core-count-test
       run: |
-        echo "#include <stdio.h>\\n int main() { int r = 0; size_t len = sizeof(r); sysctlbyname(\"hw.logicalcpu\", &r, &len, NULL, 0); printf(\"core count = %d\\n\", r); return 0; }\\n" > core-count-test.c
         clang core-count-test.c -o core-count-test
         ./core-count-test
 
