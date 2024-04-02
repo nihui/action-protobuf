@@ -56,7 +56,7 @@ jobs:
         tar -xf cmake-${{ env.OPENMP_VERSION }}.src.tar.xz
         wget https://github.com/llvm/llvm-project/releases/download/llvmorg-${{ env.OPENMP_VERSION }}/openmp-${{ env.OPENMP_VERSION }}.src.tar.xz
         tar -xf openmp-${{ env.OPENMP_VERSION }}.src.tar.xz
-        mv cmake-${{ env.OPENMP_VERSION }} cmake
+        mv cmake-${{ env.OPENMP_VERSION }}.src cmake
         cd openmp-${{ env.OPENMP_VERSION }}.src
         wget https://github.com/nihui/llvm-project/commit/9ae3af3af76a7e5bfa329b346e190ce4bcc156b5.patch
         patch -p2 -i 9ae3af3af76a7e5bfa329b346e190ce4bcc156b5.patch
