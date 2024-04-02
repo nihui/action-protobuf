@@ -58,12 +58,8 @@ jobs:
         tar -xf openmp-${{ env.OPENMP_VERSION }}.src.tar.xz
         mv cmake-${{ env.OPENMP_VERSION }}.src cmake
         cd openmp-${{ env.OPENMP_VERSION }}.src
-        wget https://github.com/nihui/llvm-project/commit/9ae3af3af76a7e5bfa329b346e190ce4bcc156b5.patch
-        wget https://github.com/nihui/llvm-project/commit/5a05956a08c5d5427257682bec16f35c63a15122.patch
-        wget https://github.com/nihui/llvm-project/commit/3876da3086bb46d49e4502941826e6d9a8248059.patch
-        patch -p2 -i 9ae3af3af76a7e5bfa329b346e190ce4bcc156b5.patch
-        patch -p2 -i 5a05956a08c5d5427257682bec16f35c63a15122.patch
-        patch -p2 -i 3876da3086bb46d49e4502941826e6d9a8248059.patch
+        wget https://github.com/nihui/llvm-project/commit/ef8c35bcf5d9cfdb0764ffde6a63c04ec715bc37.patch
+        patch -p2 -i ef8c35bcf5d9cfdb0764ffde6a63c04ec715bc37.patch
         wget https://github.com/nihui/llvm-project/commit/5c12711f9a21f41bea70566bf15a4026804d6b20.patch
         patch -p2 -i 5c12711f9a21f41bea70566bf15a4026804d6b20.patch
     - name: openmp-armv7k
