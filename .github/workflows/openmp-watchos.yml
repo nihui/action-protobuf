@@ -18,7 +18,17 @@ permissions:
 
 jobs:
   core-count-test:
-    runs-on: macos-latest
+    runs-on: macos-12
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: core-count-test
+      run: |
+        clang core-count-test.c -o core-count-test
+        ./core-count-test
+
+  core-count-test-arm64:
+    runs-on: macos-14
     steps:
     - uses: actions/checkout@v4
 
