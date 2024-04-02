@@ -43,6 +43,12 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
+    - name: core-count-test
+      run: |
+        echo "#include <stdio.h> \nint main() { int r = 0; size_t len = sizeof(r); sysctlbyname("hw.logicalcpu", &r, &len, NULL, 0); printf("core count = %d\n", r); }\n" > core-count-test.cpp
+        clang++ core-count-test.cpp -o core-count-test
+        ./core-count-test
+
     - name: cache-openmp
       id: cache-openmp
       uses: actions/cache@v4
