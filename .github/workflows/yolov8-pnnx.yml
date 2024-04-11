@@ -1,0 +1,20 @@
+name: yolov8-pnnx
+on:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+jobs:
+  linux:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/setup-python@v5
+      with:
+        python-version: 3.9
+    - name: yolov8-pnnx
+      run: |
+        pip install git+https://github.com/ultralytics/ultralytics@pnnx-latest
+        yolo export model=yolov8n.pt format=ncnn
+        yolo predict model=yolov8n_ncnn_model
