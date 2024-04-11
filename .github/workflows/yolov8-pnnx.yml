@@ -16,5 +16,5 @@ jobs:
     - name: yolov8-pnnx
       run: |
         pip install git+https://github.com/ultralytics/ultralytics@pnnx-latest
-        yolo export model=yolov8n.pt format=ncnn
-        yolo predict model=yolov8n_ncnn_model
+        yolo export model=yolov8n-seg.pt format=ncnn
+        yolo predict model=yolov8n-seg_ncnn_model
