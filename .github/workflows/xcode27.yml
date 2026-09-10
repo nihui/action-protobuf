@@ -1,0 +1,66 @@
+name: Dump Xcode 27 machine.h
+
+on:
+  workflow_dispatch:
+
+jobs:
+  dump-machine-h:
+    runs-on: xcode-27
+
+    steps:
+      - name: Show system and Xcode info
+        run: |
+          sw_vers
+          echo
+          xcodebuild -version
+          echo
+          xcode-select -p
+          echo
+          xcodebuild -showsdks
+
+      - name: Locate machine.h
+        run: |
+          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+
+          echo "SDKROOT=$SDKROOT"
+          echo
+          echo "Searching for mach/machine.h ..."
+
+          find "$SDKROOT" -path '*/mach/machine.h' -print
+
+      - name: Dump mach/machine.h
+        run: |
+          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+          HEADER="$SDKROOT/usr/include/mach/machine.h"
+
+          echo "SDKROOT=$SDKROOT"
+          echo "HEADER=$HEADER"
+          echo
+
+          if [ -f "$HEADER" ]; then
+              cat "$HEADER"
+          else
+              echo "machine.h not found at conventional path"
+              echo
+              echo "Dumping all mach/machine.h found in SDK:"
+
+              find "$SDKROOT" -path '*/mach/machine.h' -print | while read -r f; do
+                  echo
+                  echo "============================================================"
+                  echo "$f"
+                  echo "============================================================"
+                  cat "$f"
+              done
+          fi
+
+      - name: Show CPU family definitions
+        run: |
+          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+
+          echo "CPUFAMILY definitions:"
+          echo
+
+          find "$SDKROOT" -path '*/mach/machine.h' -print | while read -r f; do
+              echo "=== $f ==="
+              grep -n 'CPUFAMILY_' "$f" || true
+          done
