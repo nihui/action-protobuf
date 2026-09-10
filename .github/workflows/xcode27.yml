@@ -1,4 +1,4 @@
-name: Probe Xcode 27 RC machine.h
+name: Probe Xcode 27 machine.h
 
 on:
   workflow_dispatch:
@@ -11,64 +11,70 @@ jobs:
       - name: Show environment
         run: |
           sw_vers
-          uname -m
+          echo
           xcodebuild -version || true
+          echo
+          xcode-select -p || true
 
-      - name: Query Command Line Tools
+      - name: Find Xcode 27 Command Line Tools
         id: clt
         shell: bash
         run: |
-          set -x
+          set -euxo pipefail
 
           MARKER=/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
           touch "$MARKER"
+          trap 'rm -f "$MARKER"' EXIT
 
           /usr/sbin/softwareupdate --list --all 2>&1 | tee /tmp/softwareupdate.txt
 
           echo
           echo "===== Xcode 27 CLT entries ====="
-          grep -i "Command Line Tools.*Xcode.*27" /tmp/softwareupdate.txt || true
+          grep -i 'Command Line Tools.*Xcode.*27' /tmp/softwareupdate.txt || true
 
           LABEL="$(
             sed -nE \
               's/^[[:space:]]*\*[[:space:]]*Label:[[:space:]]*(.*)$/\1/p' \
               /tmp/softwareupdate.txt |
-            grep -i 'Command Line Tools' |
-            grep -i 'Xcode.*27' |
-            grep -iE 'Release Candidate|RC' |
+            grep -i '^Command Line Tools for Xcode 27\.0' |
             tail -1
           )"
 
-          echo "LABEL=$LABEL"
+          echo "Selected: $LABEL"
 
-          if [ -z "$LABEL" ]; then
-              echo "Xcode 27 RC Command Line Tools not available yet"
-              rm -f "$MARKER"
-              exit 1
-          fi
-
+          test -n "$LABEL"
           echo "label=$LABEL" >> "$GITHUB_OUTPUT"
 
-      - name: Install Xcode 27 RC Command Line Tools
+      - name: Install Xcode 27 Command Line Tools
         shell: bash
         run: |
           sudo /usr/sbin/softwareupdate \
             --install "${{ steps.clt.outputs.label }}" \
             --verbose
 
-          rm -f \
-            /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
-
-      - name: Find macOS SDK
-        run: |
-          echo "===== SDKs ====="
-          find /Library/Developer/CommandLineTools/SDKs \
-            -maxdepth 1 \
-            -type d -o -type l
-
-      - name: Dump machine.h
+      - name: Show installed CLT
         shell: bash
         run: |
+          echo "===== CommandLineTools ====="
+          ls -la /Library/Developer/CommandLineTools
+
+          echo
+          echo "===== SDKs ====="
+          ls -la /Library/Developer/CommandLineTools/SDKs
+
+          echo
+          echo "===== SDKSettings ====="
+          find /Library/Developer/CommandLineTools/SDKs \
+            -name SDKSettings.json \
+            -maxdepth 2 \
+            -print \
+            -exec cat {} \; || true
+
+      - name: Dump Xcode 27 machine.h
+        shell: bash
+        run: |
+          set -euxo pipefail
+
           HEADER="$(
             find /Library/Developer/CommandLineTools/SDKs \
               -path '*/usr/include/mach/machine.h' \
@@ -77,32 +83,13 @@ jobs:
             tail -1
           )"
 
-          if [ -z "$HEADER" ]; then
-              echo "machine.h not found"
-              exit 1
-          fi
-
           echo "HEADER=$HEADER"
+          test -f "$HEADER"
+
           echo
-          echo "========================================"
+          echo "===== CPUFAMILY_ARM definitions ====="
+          grep -n 'CPUFAMILY_ARM_' "$HEADER"
+
+          echo
+          echo "===== Full machine.h ====="
           cat "$HEADER"
-          echo "========================================"
-
-          cp "$HEADER" machine.h
-
-      - name: Show Apple CPU families
-        run: |
-          echo "===== CPUFAMILY_ARM ====="
-          grep -n 'CPUFAMILY_ARM_' machine.h || true
-
-          echo
-          echo "===== Possible A20 / M6 codenames ====="
-          grep -niE \
-            'A20|M6|BANDA|BORNEO|KOMODO|H19|H18G' \
-            machine.h || true
-
-      - name: Upload machine.h
-        uses: actions/upload-artifact@v4
-        with:
-          name: xcode-27-rc-machine-h
-          path: machine.h
