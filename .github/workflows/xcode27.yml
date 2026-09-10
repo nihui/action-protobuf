@@ -8,15 +8,7 @@ jobs:
     runs-on: xcode-27
 
     steps:
-      - name: Show environment
-        run: |
-          sw_vers
-          echo
-          xcodebuild -version || true
-          echo
-          xcode-select -p || true
-
-      - name: Find Xcode 27 Command Line Tools
+      - name: Find Xcode 27 CLT
         id: clt
         shell: bash
         run: |
@@ -26,70 +18,95 @@ jobs:
           touch "$MARKER"
           trap 'rm -f "$MARKER"' EXIT
 
-          /usr/sbin/softwareupdate --list --all 2>&1 | tee /tmp/softwareupdate.txt
-
-          echo
-          echo "===== Xcode 27 CLT entries ====="
-          grep -i 'Command Line Tools.*Xcode.*27' /tmp/softwareupdate.txt || true
+          softwareupdate --list --all 2>&1 | tee /tmp/softwareupdate.txt
 
           LABEL="$(
             sed -nE \
               's/^[[:space:]]*\*[[:space:]]*Label:[[:space:]]*(.*)$/\1/p' \
               /tmp/softwareupdate.txt |
-            grep -i '^Command Line Tools for Xcode 27\.0' |
+            grep '^Command Line Tools for Xcode 27\.0' |
             tail -1
           )"
 
-          echo "Selected: $LABEL"
-
+          echo "LABEL=$LABEL"
           test -n "$LABEL"
+
           echo "label=$LABEL" >> "$GITHUB_OUTPUT"
 
-      - name: Install Xcode 27 Command Line Tools
+      - name: Download Xcode 27 CLT only
         shell: bash
         run: |
-          sudo /usr/sbin/softwareupdate \
-            --install "${{ steps.clt.outputs.label }}" \
-            --verbose
+          set -euxo pipefail
 
-      - name: Show installed CLT
+          sudo softwareupdate \
+            --download "${{ steps.clt.outputs.label }}"
+
+          echo
+          echo "===== downloaded packages ====="
+
+          sudo find /Library/Updates \
+            -type f \
+            \( -name '*.pkg' -o -name '*.dist' \) \
+            -print || true
+
+      - name: Extract downloaded CLT packages
         shell: bash
         run: |
-          echo "===== CommandLineTools ====="
-          ls -la /Library/Developer/CommandLineTools
+          set -euxo pipefail
+
+          mkdir -p "$RUNNER_TEMP/clt-packages"
+          mkdir -p "$RUNNER_TEMP/clt-expanded"
+
+          # Copy packages out of Software Update cache
+          i=0
+          while IFS= read -r pkg; do
+              echo "Found package: $pkg"
+
+              name="$(basename "$pkg")"
+              dst="$RUNNER_TEMP/clt-packages/${i}_${name}"
+
+              sudo cp "$pkg" "$dst"
+
+              out="$RUNNER_TEMP/clt-expanded/pkg_$i"
+              mkdir -p "$out"
+
+              pkgutil --expand-full "$dst" "$out" || true
+
+              i=$((i + 1))
+          done < <(
+              sudo find /Library/Updates \
+                -type f \
+                -name '*.pkg' \
+                -print
+          )
 
           echo
-          echo "===== SDKs ====="
-          ls -la /Library/Developer/CommandLineTools/SDKs
+          echo "===== expanded files ====="
 
-          echo
-          echo "===== SDKSettings ====="
-          find /Library/Developer/CommandLineTools/SDKs \
-            -name SDKSettings.json \
-            -maxdepth 2 \
-            -print \
-            -exec cat {} \; || true
+          find "$RUNNER_TEMP/clt-expanded" \
+            -path '*/usr/include/mach/machine.h' \
+            -print
 
-      - name: Dump Xcode 27 machine.h
+      - name: Dump machine.h
         shell: bash
         run: |
           set -euxo pipefail
 
           HEADER="$(
-            find /Library/Developer/CommandLineTools/SDKs \
-              -path '*/usr/include/mach/machine.h' \
-              -print |
-            sort -V |
-            tail -1
+              find "$RUNNER_TEMP/clt-expanded" \
+                -path '*/usr/include/mach/machine.h' \
+                -print |
+              head -1
           )"
 
           echo "HEADER=$HEADER"
+          test -n "$HEADER"
           test -f "$HEADER"
 
           echo
-          echo "===== CPUFAMILY_ARM definitions ====="
+          echo "===== latest CPUFAMILY_ARM definitions ====="
           grep -n 'CPUFAMILY_ARM_' "$HEADER"
 
           echo
-          echo "===== Full machine.h ====="
-          cat "$HEADER"
+          echo "===== tail ====="
+          grep 'CPUFAMILY_ARM_' "$HEADER" | tail -20
