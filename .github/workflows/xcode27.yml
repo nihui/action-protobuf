@@ -1,66 +1,108 @@
-name: Dump Xcode 27 machine.h
+name: Probe Xcode 27 RC machine.h
 
 on:
   workflow_dispatch:
 
 jobs:
-  dump-machine-h:
+  probe:
     runs-on: xcode-27
 
     steps:
-      - name: Show system and Xcode info
+      - name: Show environment
         run: |
           sw_vers
-          echo
-          xcodebuild -version
-          echo
-          xcode-select -p
-          echo
-          xcodebuild -showsdks
+          uname -m
+          xcodebuild -version || true
 
-      - name: Locate machine.h
+      - name: Query Command Line Tools
+        id: clt
+        shell: bash
         run: |
-          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+          set -x
 
-          echo "SDKROOT=$SDKROOT"
+          MARKER=/tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+          touch "$MARKER"
+
+          /usr/sbin/softwareupdate --list --all 2>&1 | tee /tmp/softwareupdate.txt
+
           echo
-          echo "Searching for mach/machine.h ..."
+          echo "===== Xcode 27 CLT entries ====="
+          grep -i "Command Line Tools.*Xcode.*27" /tmp/softwareupdate.txt || true
 
-          find "$SDKROOT" -path '*/mach/machine.h' -print
+          LABEL="$(
+            sed -nE \
+              's/^[[:space:]]*\*[[:space:]]*Label:[[:space:]]*(.*)$/\1/p' \
+              /tmp/softwareupdate.txt |
+            grep -i 'Command Line Tools' |
+            grep -i 'Xcode.*27' |
+            grep -iE 'Release Candidate|RC' |
+            tail -1
+          )"
 
-      - name: Dump mach/machine.h
-        run: |
-          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
-          HEADER="$SDKROOT/usr/include/mach/machine.h"
+          echo "LABEL=$LABEL"
 
-          echo "SDKROOT=$SDKROOT"
-          echo "HEADER=$HEADER"
-          echo
-
-          if [ -f "$HEADER" ]; then
-              cat "$HEADER"
-          else
-              echo "machine.h not found at conventional path"
-              echo
-              echo "Dumping all mach/machine.h found in SDK:"
-
-              find "$SDKROOT" -path '*/mach/machine.h' -print | while read -r f; do
-                  echo
-                  echo "============================================================"
-                  echo "$f"
-                  echo "============================================================"
-                  cat "$f"
-              done
+          if [ -z "$LABEL" ]; then
+              echo "Xcode 27 RC Command Line Tools not available yet"
+              rm -f "$MARKER"
+              exit 1
           fi
 
-      - name: Show CPU family definitions
+          echo "label=$LABEL" >> "$GITHUB_OUTPUT"
+
+      - name: Install Xcode 27 RC Command Line Tools
+        shell: bash
         run: |
-          SDKROOT="$(xcrun --sdk macosx --show-sdk-path)"
+          sudo /usr/sbin/softwareupdate \
+            --install "${{ steps.clt.outputs.label }}" \
+            --verbose
 
-          echo "CPUFAMILY definitions:"
+          rm -f \
+            /tmp/.com.apple.dt.CommandLineTools.installondemand.in-progress
+
+      - name: Find macOS SDK
+        run: |
+          echo "===== SDKs ====="
+          find /Library/Developer/CommandLineTools/SDKs \
+            -maxdepth 1 \
+            -type d -o -type l
+
+      - name: Dump machine.h
+        shell: bash
+        run: |
+          HEADER="$(
+            find /Library/Developer/CommandLineTools/SDKs \
+              -path '*/usr/include/mach/machine.h' \
+              -print |
+            sort -V |
+            tail -1
+          )"
+
+          if [ -z "$HEADER" ]; then
+              echo "machine.h not found"
+              exit 1
+          fi
+
+          echo "HEADER=$HEADER"
           echo
+          echo "========================================"
+          cat "$HEADER"
+          echo "========================================"
 
-          find "$SDKROOT" -path '*/mach/machine.h' -print | while read -r f; do
-              echo "=== $f ==="
-              grep -n 'CPUFAMILY_' "$f" || true
-          done
+          cp "$HEADER" machine.h
+
+      - name: Show Apple CPU families
+        run: |
+          echo "===== CPUFAMILY_ARM ====="
+          grep -n 'CPUFAMILY_ARM_' machine.h || true
+
+          echo
+          echo "===== Possible A20 / M6 codenames ====="
+          grep -niE \
+            'A20|M6|BANDA|BORNEO|KOMODO|H19|H18G' \
+            machine.h || true
+
+      - name: Upload machine.h
+        uses: actions/upload-artifact@v4
+        with:
+          name: xcode-27-rc-machine-h
+          path: machine.h
