@@ -1,1 +1,2 @@
-Synthetic binary-size report transport test, revision 1.
+Synthetic binary-size report transport test, revision 2.
+Verify that the existing bot comment is updated, not duplicated.
