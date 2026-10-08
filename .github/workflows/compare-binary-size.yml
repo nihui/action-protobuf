@@ -1,0 +1,25 @@
+name: compare-binary-size
+on:
+  push:
+    branches: [binary-size-comment-e2e-20261008]
+  pull_request:
+    branches: [master]
+    paths: [binary-size-comment-e2e-fixture.txt]
+permissions:
+  contents: read
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate synthetic report for comment transport test
+        env:
+          N: ${{ github.run_number }}
+        run: |
+          printf 'The binary size change of libncnn.so (bytes)\n| architecture | base size | pr size | difference |\n|--------------|-----------|---------|------------|\n' > compare-binary-size.md
+          for arch in x86_64 armhf aarch64; do
+            printf '| %s | 1000 | %s | +%s :warning: |\n' "$arch" "$((1000+N))" "$N" >> compare-binary-size.md
+          done
+      - uses: actions/upload-artifact@v4
+        with:
+          name: compare-binary-size.md
+          path: compare-binary-size.md
